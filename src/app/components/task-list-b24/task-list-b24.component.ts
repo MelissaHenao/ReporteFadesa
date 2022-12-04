@@ -10,10 +10,9 @@ export class TaskListB24Component implements OnInit {
 
   userId: string = "41";
   usersFadesa: any[] = [];
-  tareasFadesa: any[] = [];
-  tasksForUser: any[] = [];
-  tasksFilter: any[] = [];
-  idInterval: number | undefined;
+  tasksFadesa: any[] = [];
+  tasksFilterForUser: any[] = [];
+  report: any[] = [];
 
   constructor(
     //variable que me hereda las propiedades del servicio (taskB24)
@@ -21,8 +20,7 @@ export class TaskListB24Component implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //aca es para utilizar los metodos 
-    // this.getTasksForUser(this.userId);
+    //aca es para utilizar los metodos
     this.getUser();
   }
 
@@ -36,7 +34,7 @@ export class TaskListB24Component implements OnInit {
         while (start < totalUsers) {
           this.tasksB24.getUserList(start).subscribe({
             'next': (nextUsers: any) => {
-              nextUsers.result.forEach((user:any) => {
+              nextUsers.result.forEach((user: any) => {
                 this.usersFadesa.push(user);
               });
             },
@@ -44,67 +42,75 @@ export class TaskListB24Component implements OnInit {
           })
           start += 50;
         }
-        console.log("Usuarios fadesa:", this.usersFadesa);
-        let count = 0;
-        this.idInterval = window.setInterval(() => {
-          console.log("userID:", this.usersFadesa[count].ID);
-          this.getTasksForUser(this.usersFadesa[count].ID);
-          count++;
-          console.log("Contador:", count);
-          if (count >= totalUsers) {
-            setTimeout(() => {
-              this.tasksFilterFadesa();
-            }, 1000);
-            clearInterval(this.idInterval);
-          }
-        }, 1000);
-        console.log("Tareas por usuario:", this.tasksForUser);
+        this.tasksFilterFadesa();
       },
       'error': error => console.log(error)
     })
   }
 
-  getTasksForUser(userId: number) {
-    let filter = {
-      filter: {
-        RESPONSIBLE_ID: userId
-      }
-    }
-    this.tasksB24.getTaskList(0, filter).subscribe({
+  getTasksFadesa() {
+    this.tasksB24.getTaskList(0).subscribe({
       //taskList= me va recibir lo que traiga el metodo getTaskList que va a venir de service
       // next es la respuesta positiva de la peticion que se acaba de ejecutar 
       'next': (taskList: any) => {
         let start = 50;
         let totalTareas = taskList.total;
-        let tasksFadesa = [];
-        tasksFadesa = taskList.result.tasks;
-        
+        this.tasksFadesa = taskList.result.tasks;
+
         while (start < totalTareas) {
-          this.tasksB24.getTaskList(start, filter).subscribe({
+          this.tasksB24.getTaskList(start).subscribe({
             'next': (nextTasks: any) => {
               nextTasks.result.tasks.forEach((tasks: any) => {
-                tasksFadesa.push(tasks);
+                this.tasksFadesa.push(tasks);
               })
             },
             'error': error => console.log(error)
           })
           start += 50;
         }
-        this.tasksForUser.push(tasksFadesa);
       },
       'error': error => console.log(error)
     })
   }
 
   tasksFilterFadesa() {
-    console.log("Total tareas:", this.tasksForUser.length);
-    this.tasksForUser.forEach(task => {
-      const taskFilter = task.filter((taskFadesa: any) => taskFadesa.status === "3" || taskFadesa.status === "5" || taskFadesa.subStatus === "-1");
-      if (taskFilter.length > 0) {
-        this.tasksFilter.push(taskFilter);
-      }
+    this.getTasksFadesa();
+    setTimeout(() => {
+      console.log("Usuarios fadesa:", this.usersFadesa);
+      console.log("Total tareas:", this.tasksFadesa);
+      this.usersFadesa.forEach(user => {
+        const tasksFilter = this.tasksFadesa.filter(task => task.responsibleId === user.ID);
+        if (tasksFilter.length > 0) {
+          this.tasksFilterForUser.push(tasksFilter);
+        }
+      })
+      console.log("Tareas Filtradas Por Usuario:", this.tasksFilterForUser);
+      this.generateReport();
+    }, 5000);
+  }
+
+  generateReport() {
+    this.tasksFilterForUser.forEach(tasksUser => {
+      const nameUser = tasksUser[0].responsible.name;
+      const charge = this.usersFadesa.filter(user => user.ID === tasksUser[0].responsible.id)[0].WORK_POSITION;
+      const totalTasks = tasksUser.length;
+      const tasksInProgress = tasksUser.filter((task: any) => task.status === "3").length;
+      const completedTasks = tasksUser.filter((task: any) => task.status === "5").length;
+      const overdueTasks = tasksUser.filter((task: any) => task.subStatus === "-1").length;
+      let efficiency = ((totalTasks - overdueTasks) * 100) / totalTasks;
+      this.report.push(
+        {
+          name: nameUser,
+          charge: charge,
+          totalTasks: totalTasks,
+          tasksInProgress: tasksInProgress,
+          completedTasks: completedTasks,
+          overdueTasks: overdueTasks,
+          efficiency: efficiency
+        }
+      )
     })
-    console.log("Tareas filtradas:", this.tasksFilter);
+    console.log("Reporte:", this.report);
   }
 
 }

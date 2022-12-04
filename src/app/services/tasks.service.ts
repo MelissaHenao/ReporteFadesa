@@ -11,7 +11,7 @@ private readonly webHockUrl= environment.webHockUrl;
   constructor(private readonly http: HttpClient) {}
   //el HttpClient debe ser importado en app
 
-  getTaskList(start: number, filter: any){
+  getTaskList(start: number, filter?: any){
     let body = filter;
     return this.http.post(`${this.webHockUrl}/tasks.task.list?start=${start}`, body);
   }
