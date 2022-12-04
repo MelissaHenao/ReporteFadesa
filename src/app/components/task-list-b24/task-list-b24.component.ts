@@ -8,8 +8,8 @@ import { TasksService } from '../../services/tasks.service';
 })
 export class TaskListB24Component implements OnInit {
 
-  userId: string = "41";
   usersFadesa: any[] = [];
+  departmentsFadesa: any[] = [];
   tasksFadesa: any[] = [];
   tasksFilterForUser: any[] = [];
   report: any[] = [];
@@ -21,6 +21,8 @@ export class TaskListB24Component implements OnInit {
 
   ngOnInit(): void {
     //aca es para utilizar los metodos
+    this.getTasksFadesa();
+    this.getDepartmentsFadesa();
     this.getUser();
   }
 
@@ -43,6 +45,15 @@ export class TaskListB24Component implements OnInit {
           start += 50;
         }
         this.tasksFilterFadesa();
+      },
+      'error': error => console.log(error)
+    })
+  }
+
+  getDepartmentsFadesa() {
+    this.tasksB24.getDepartments().subscribe({
+      'next': (departments: any) => {
+        this.departmentsFadesa = departments.result;
       },
       'error': error => console.log(error)
     })
@@ -74,7 +85,6 @@ export class TaskListB24Component implements OnInit {
   }
 
   tasksFilterFadesa() {
-    this.getTasksFadesa();
     setTimeout(() => {
       console.log("Usuarios fadesa:", this.usersFadesa);
       console.log("Total tareas:", this.tasksFadesa);
@@ -92,7 +102,8 @@ export class TaskListB24Component implements OnInit {
   generateReport() {
     this.tasksFilterForUser.forEach(tasksUser => {
       const nameUser = tasksUser[0].responsible.name;
-      const charge = this.usersFadesa.filter(user => user.ID === tasksUser[0].responsible.id)[0].WORK_POSITION;
+      const departmentId = this.usersFadesa.filter(user => user.ID === tasksUser[0].responsible.id)[0].UF_DEPARTMENT[0];
+      const department = this.departmentsFadesa.filter(department => department.ID == departmentId)[0].NAME;
       const totalTasks = tasksUser.length;
       const tasksInProgress = tasksUser.filter((task: any) => task.status === "3").length;
       const completedTasks = tasksUser.filter((task: any) => task.status === "5").length;
@@ -101,7 +112,7 @@ export class TaskListB24Component implements OnInit {
       this.report.push(
         {
           name: nameUser,
-          charge: charge,
+          department: department,
           totalTasks: totalTasks,
           tasksInProgress: tasksInProgress,
           completedTasks: completedTasks,

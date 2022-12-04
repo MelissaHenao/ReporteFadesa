@@ -20,4 +20,9 @@ private readonly webHockUrl= environment.webHockUrl;
   getUserList(start:number){
     return this.http.get(`${this.webHockUrl}/user.get?start=${start}`);
   }
+
+  //Metodo para obtener los departamentos B24 Fadesa
+  getDepartments(){
+    return this.http.get(`${this.webHockUrl}/department.get`);
+  }
 }
