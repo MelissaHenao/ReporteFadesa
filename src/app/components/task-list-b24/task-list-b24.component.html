@@ -1,1 +1,42 @@
-<p>task-list-b24 works!</p>
+<section class="container">
+    <section class="justify-content-center row mt-5 mb-5">
+        <div class="col-6 text-center">
+            <h3>REPORTE PERSONALIZADO FADESA</h3>
+        </div>
+    </section>
+    <div class="row justify-content-center">
+        <button *ngIf="!stageButton" (click)="buttonReport()" type="button" class="col-6 btn btn-success">Generar
+            reporte personalizado</button>
+    </div>
+
+    <section *ngIf="stageButton" class="row justify-content-center">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Responsable</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Total tareas</th>
+                    <th scope="col">Total tarea completadas</th>
+                    <th scope="col">Total tarea en progreso</th>
+                    <th scope="col">Total tarea atrasadas</th>
+                    <th scope="col"> % Eficiencia</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let reports of report">
+                    <td>{{reports.name}}</td>
+                    <td>{{reports.department}}</td>
+                    <td>{{reports.totalTasks}}</td>
+                    <td>{{reports.completedTasks}}</td>
+                    <td>{{reports.tasksInProgress}}</td>
+                    <td>{{reports.overdueTasks}}</td>
+                    <td>{{reports.efficiency}} %</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <div class="row justify-content-center mt-3 mb-5">
+        <button *ngIf="stageButton" (click)="buttonReport()" type="button" class="col-4 btn btn-success">Exportar reporte a excel</button>
+    </div>
+</section>

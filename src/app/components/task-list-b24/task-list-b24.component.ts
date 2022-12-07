@@ -13,6 +13,7 @@ export class TaskListB24Component implements OnInit {
   tasksFadesa: any[] = [];
   tasksFilterForUser: any[] = [];
   report: any[] = [];
+  stageButton: boolean = false; 
 
   constructor(
     //variable que me hereda las propiedades del servicio (taskB24)
@@ -96,7 +97,7 @@ export class TaskListB24Component implements OnInit {
       })
       console.log("Tareas Filtradas Por Usuario:", this.tasksFilterForUser);
       this.generateReport();
-    }, 5000);
+    }, 3000);
   }
 
   generateReport() {
@@ -108,7 +109,7 @@ export class TaskListB24Component implements OnInit {
       const tasksInProgress = tasksUser.filter((task: any) => task.status === "3").length;
       const completedTasks = tasksUser.filter((task: any) => task.status === "5").length;
       const overdueTasks = tasksUser.filter((task: any) => task.subStatus === "-1").length;
-      let efficiency = ((totalTasks - overdueTasks) * 100) / totalTasks;
+      let efficiency = Number((((totalTasks - overdueTasks) * 100) / totalTasks).toFixed(1));
       this.report.push(
         {
           name: nameUser,
@@ -124,4 +125,7 @@ export class TaskListB24Component implements OnInit {
     console.log("Reporte:", this.report);
   }
 
+  buttonReport(){
+    this.stageButton = true;
+  }
 }
