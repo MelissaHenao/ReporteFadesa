@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TasksService } from '../../services/tasks.service';
+import { utils, writeFileXLSX } from 'xlsx'
 
 @Component({
   selector: 'task-list-b24',
@@ -8,6 +9,13 @@ import { TasksService } from '../../services/tasks.service';
 })
 export class TaskListB24Component implements OnInit {
 
+  public config = {
+    printMode: 'template',
+    popupProperties: 'toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,fullscreen=yes',
+    stylesheets: [{ rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css' }],
+    styles: ['img { display: none; }']
+  }
+
   usersFadesa: any[] = [];
   departmentsFadesa: any[] = [];
   tasksFadesa: any[] = [];
@@ -15,7 +23,9 @@ export class TaskListB24Component implements OnInit {
   report: any[] = [];
   stageButton: boolean = false; 
 
+
   constructor(
+
     //variable que me hereda las propiedades del servicio (taskB24)
     private readonly tasksB24: TasksService
   ) { }
@@ -112,13 +122,13 @@ export class TaskListB24Component implements OnInit {
       let efficiency = Number((((totalTasks - overdueTasks) * 100) / totalTasks).toFixed(1));
       this.report.push(
         {
-          name: nameUser,
-          department: department,
-          totalTasks: totalTasks,
-          tasksInProgress: tasksInProgress,
-          completedTasks: completedTasks,
-          overdueTasks: overdueTasks,
-          efficiency: efficiency
+          Responsable: nameUser,
+          Departamento: department,
+          TotalTareas: totalTasks,
+          TareasEnProgreso: tasksInProgress,
+          TareasCompletadas: completedTasks,
+          TareasConInconvenientes: overdueTasks,
+          Eficiencia: efficiency
         }
       )
     })
@@ -128,4 +138,13 @@ export class TaskListB24Component implements OnInit {
   buttonReport(){
     this.stageButton = true;
   }
+//por cada fila se imprime un objeto y por cada atributo se imprime
+  exportExcel(reporte: any) {
+    const ws = utils.json_to_sheet(reporte);
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Data");
+    writeFileXLSX(wb, `Reporte Fadesa.xlsx`);
+  }
+
+  
 }

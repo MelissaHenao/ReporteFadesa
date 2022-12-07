@@ -1,4 +1,4 @@
-<section class="container">
+<section class="container" id="document">
     <section class="justify-content-center row mt-5 mb-5">
         <div class="col-6 text-center">
             <h3>REPORTE PERSONALIZADO FADESA</h3>
@@ -25,18 +25,22 @@
             </thead>
             <tbody>
                 <tr *ngFor="let reports of report">
-                    <td>{{reports.name}}</td>
-                    <td>{{reports.department}}</td>
-                    <td>{{reports.totalTasks}}</td>
-                    <td>{{reports.completedTasks}}</td>
-                    <td>{{reports.tasksInProgress}}</td>
-                    <td>{{reports.overdueTasks}}</td>
-                    <td>{{reports.efficiency}} %</td>
+                    <td>{{reports.Responsable}}</td>
+                    <td>{{reports.Departamento}}</td>
+                    <td>{{reports.TotalTareas}}</td>
+                    <td>{{reports.TareasCompletadas}}</td>
+                    <td>{{reports.TareasEnProgresp}}</td>
+                    <td>{{reports.TareasConInconvenientes}}</td>
+                    <td>{{reports.Eficiencia}} %</td>
                 </tr>
             </tbody>
         </table>
     </section>
     <div class="row justify-content-center mt-3 mb-5">
-        <button *ngIf="stageButton" (click)="buttonReport()" type="button" class="col-4 btn btn-success">Exportar reporte a excel</button>
+        <button *ngIf="stageButton" (click)="buttonReport(); exportExcel(report)" type="button" class="col-4 btn btn-success">Exportar reporte a excel</button>
     </div>
+
+     <!-- <div class="mt-4">
+        <a class="btn btn-outline-primary col-auto border-0" [attr.role]="'button'" (click)="exportExcel(report)">Exportar a Excel</a>
+      </div> -->
 </section>
